@@ -1,0 +1,16 @@
+dependencies {
+  implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+  implementation "com.google.guava:guava:$guavaVersion"
+  implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+  implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+  implementation "org.ocpsoft.prettytime:prettytime:5.0.6.Final"
+  implementation "com.googlecode.json-simple:json-simple:1.1.1"
+  implementation name: 'tween-engine-api'
+}
+
+sourceSets {
+  main {
+    java.srcDirs = ['src/main/java']
+  }
+}

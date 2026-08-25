@@ -95,14 +95,14 @@
       {
         "type": "UNLOCK",
         "thing": "ACHIEVEMENT",
-        "thingId": "tutorial-pan"
+        "thingId": "tutorial-hire-employees"
       }
     ]
   },
   {
-    "id": "tutorial-pan",
-    "name": "Navigation",
-    "description": "Now that your Tower is up and running,\nlets learn how to control your camera.\n\nTo move the screen around,\ntap anywhere and drag.",
+    "id": "tutorial-hire-employees",
+    "name": "Pizza Business 101",
+    "description": "Someone has to make the Pizza before\nit can be sold to hungry Droids.\n\nTake a look at your Pizza Place.\nSee the blue and green icon displayed?\nThis means there are no Droids employed there.\n\nTap on the Pizza Place,\nthen click \"Manage\" to hire an employee.",
     "requirements": [
       {
         "type": "BUILD",
@@ -111,6 +111,51 @@
         "amount": 1
       }
     ],
+    "rewards": [
+      {
+        "type": "UNLOCK",
+        "thing": "ACHIEVEMENT",
+        "thingId": "tutorial-management101"
+      }
+    ]
+  },
+  {
+    "id": "tutorial-management101",
+    "name": "Business Management 101",
+    "description": "Your Tower now has its own Small Business.\n\nUnfortunately running a small business\nis more complicated than just hiring employees.",
+    "tapToGiveReward": true,
+    "requirements": [
+      {
+        "type": "HIRE",
+        "thing": "EMPLOYEE",
+        "amount": 1
+      }
+    ],
+    "rewards": [
+      {
+        "type": "COMPLETE",
+        "thing": "ACHIEVEMENT",
+        "thingId": "tutorial-management103"
+      }
+    ]
+  },
+  {
+    "id": "tutorial-management103",
+    "name": "Profit and Loss Statement",
+    "description": "A thriving business should make a profit.\n\nThe info panel for the Pizza Place\nprovides income and cost info.\n\nThe cost comes from employees you hire.\nIf you have too many employees,\nor not enough business the cost will\nappear in red.\n\nYou must balance your population\nand demand for consumer goods by not\nover building in any category.",
+    "tapToGiveReward": true,
+    "rewards": [
+      {
+        "type": "COMPLETE",
+        "thing": "ACHIEVEMENT",
+        "thingId": "tutorial-pan"
+      }
+    ]
+  },
+  {
+    "id": "tutorial-pan",
+    "name": "Navigation",
+    "description": "Now that your Tower is up and running,\nlets learn how to control your camera.\n\nTo move the screen around,\ntap anywhere and drag.",
     "rewards": [
       {
         "type": "UNLOCK",
