@@ -11,3 +11,7 @@ libbullet.so
 sparky/tmp/
 local.properties
 workspace.xml
+
+# Gradle
+.gradle/
+build/

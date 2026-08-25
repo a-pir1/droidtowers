@@ -1,0 +1,181 @@
+/*
+ * Copyright (c) 2012. HappyDroids LLC, All rights reserved.
+ */
+
+package com.happydroids.droidtowers.entities;
+
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Pools;
+import com.google.common.collect.Lists;
+import com.happydroids.droidtowers.achievements.AchievementEngine;
+import com.happydroids.droidtowers.employee.JobCandidate;
+import com.happydroids.droidtowers.events.EmployeeFiredEvent;
+import com.happydroids.droidtowers.events.EmployeeHiredEvent;
+import com.happydroids.droidtowers.grid.GameGrid;
+import com.happydroids.droidtowers.gui.CommercialSpacePopOver;
+import com.happydroids.droidtowers.gui.GridObjectPopOver;
+import com.happydroids.droidtowers.types.CommercialType;
+
+import java.util.List;
+
+public class CommercialSpace extends Room {
+  protected List<JobCandidate> employees;
+
+  public CommercialSpace(CommercialType commercialType, GameGrid gameGrid) {
+    super(commercialType, gameGrid);
+    employees = Lists.newArrayListWithCapacity(commercialType.getJobsProvided());
+  }
+
+  @Override
+  public GridObjectPopOver makePopOver() {
+    return new CommercialSpacePopOver(this);
+  }
+
+  @Override public boolean needsDroids() {
+    return employees.isEmpty();
+  }
+
+  public void updateJobs() {
+    // Job openings are now filled by hiring JobCandidates directly; nothing to simulate here.
+  }
+
+  public int getJobsFilled() {
+    return employees.size();
+  }
+
+  @Override
+  public float getNoiseLevel() {
+    if (getJobsFilled() > 0) {
+      return gridObjectType.getNoiseLevel() * ((float) getJobsFilled() / ((CommercialType) gridObjectType).getJobsProvided());
+    }
+
+    return 0;
+  }
+
+  @Override
+  public int getCoinsEarned() {
+    if (getJobsFilled() > 0 && isConnectedToTransport()) {
+      return (int) Math.ceil(gridObjectType.getCoinsEarned() * getDesirability() + getUpkeepCost() + gridObjectType.getCoinsEarned() * 0.06125f * getNumVisitors());
+    }
+
+    return 0;
+  }
+
+  @Override
+  public int getUpkeepCost() {
+    if (employees.isEmpty()) {
+      return 0;
+    }
+
+    int totalSalaries = 0;
+    for (JobCandidate employee : employees) {
+      totalSalaries += employee.getSalary();
+    }
+
+    return totalSalaries;
+  }
+
+  @Override
+  public float getDesirability() {
+    if (canEmployDroids() && getEmployees().isEmpty()) {
+      return 0f;
+    }
+
+    return super.getDesirability();
+  }
+
+  public float getEmploymentLevel() {
+    int jobsProvided = ((CommercialType) gridObjectType).getJobsProvided();
+
+    if (jobsProvided > 0) {
+      return MathUtils.clamp(employees.size() / (float) jobsProvided, 0, 1);
+    }
+
+    return 0;
+  }
+
+  public int getJobsProvided() {
+    return ((CommercialType) gridObjectType).getJobsProvided();
+  }
+
+  @Override
+  protected void checkDecals() {
+    super.checkDecals();
+
+    if (canEmployDroids()) {
+      if (employees.size() == 0) {
+        decalsToDraw.add(DECAL_NEEDS_DROIDS);
+      } else {
+        decalsToDraw.remove(DECAL_NEEDS_DROIDS);
+      }
+    }
+
+    boolean unlockedJanitors = AchievementEngine.instance().findById("build5commercialspaces").hasGivenReward();
+    boolean unlockedMaids = AchievementEngine.instance().findById("build8hotelroom").hasGivenReward();
+    if (unlockedJanitors && unlockedMaids && getDirtLevel() >= 0.95f && !getEmployees().isEmpty()) {
+      decalsToDraw.add(DECAL_DIRTY);
+    } else {
+      decalsToDraw.remove(DECAL_DIRTY);
+    }
+  }
+
+  protected boolean canEmployDroids() {
+    return true;
+  }
+
+  public void addEmployee(JobCandidate selectedCandidate) {
+    employees.add(selectedCandidate);
+    EmployeeHiredEvent event = Pools.obtain(EmployeeHiredEvent.class);
+    event.setGridObject(this);
+    event.setEmployee(selectedCandidate);
+    gameGrid.events().post(event);
+    Pools.free(event);
+  }
+
+  public List<JobCandidate> getEmployees() {
+    return employees;
+  }
+
+  public void setEmployees(List<JobCandidate> employees) {
+    this.employees.clear();
+
+    JobCandidate employee;
+    for (int i = 0, employeesSize = employees.size(); i < employeesSize; i++) {
+      employee = employees.get(i);
+      addEmployee(employee);
+    }
+  }
+
+  public void fireAllEmployees() {
+    JobCandidate employee;
+    EmployeeFiredEvent event = Pools.obtain(EmployeeFiredEvent.class);
+    for (int i = 0, employeesSize = employees.size(); i < employeesSize; i++) {
+      employee = employees.get(i);
+      event.setGridObject(this);
+      event.setEmployee(employee);
+      gameGrid.events().post(event);
+    }
+
+    Pools.free(event);
+
+    employees.clear();
+  }
+
+  public void removeEmployee(JobCandidate employee) {
+    employees.remove(employee);
+    EmployeeFiredEvent event = Pools.obtain(EmployeeFiredEvent.class);
+    event.setGridObject(this);
+    event.setEmployee(employee);
+    gameGrid.events().post(event);
+    Pools.free(event);
+  }
+
+  @Override
+  public float getDirtLevel() {
+    if (canEmployDroids() && getEmployees().isEmpty()) {
+      return 0;
+    }
+
+    return super.getDirtLevel();
+  }
+}

@@ -1,0 +1,16 @@
+allprojects {
+  apply plugin: 'java'
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
+
+  tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << '-Xmaxerrs' << '100000'
+    options.compilerArgs << '-Xmaxwarns' << '0'
+  }
+
+  repositories {
+    mavenCentral()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    flatDir { dirs "${rootDir}/main/libs/main" }
+  }
+}
